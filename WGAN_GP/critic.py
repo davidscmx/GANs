@@ -55,7 +55,6 @@ class Critic(nn.Module):
 
 
 class test_critic(unittest.TestCase):
-    #Test your make_disc_block() function
     num_test = 100
     gen = Generator()
     critic = Critic()
@@ -63,14 +62,9 @@ class test_critic(unittest.TestCase):
     
     ## Test the hidden block
     def test_hidden_block(self):
-          #Test your make_disc_block() function
-        num_test = 100
-        gen = Generator()
-        critic = Critic()
-        test_images = gen(get_noise(num_test, gen.z_dim))
-        test_hidden = critic.make_crit_block(1, 5, kernel_size=6, stride=3)
-        hidden_output = test_hidden_block(test_images)
-        self.assertEqual(hidden_output.shape, (num_test, 5, 8, 8))
+        test_hidden_block = test_critic.critic.make_crit_block(1, 5, kernel_size=6, stride=3)
+        hidden_output = test_hidden_block(test_critic.test_images)
+        self.assertEqual(hidden_output.shape, (test_critic.num_test, 5, 8, 8))
         
         # Because of the LeakyReLU slope
         self.assertGreater( -hidden_output.min() / hidden_output.max(), 0.15)
@@ -80,15 +74,11 @@ class test_critic(unittest.TestCase):
     
     ## Test the final block    
     def test_final_block(self):  
-          #Test your make_disc_block() function
-        num_test = 100
-        gen = Generator()
-        critic = Critic()
-        test_images = gen(get_noise(num_test, gen.z_dim))  
-        test_final_block = critic.make_crit_block(1, 10, kernel_size=2, stride=5, final_layer=True)
-        final_output = test_final_block(test_images)
+        #Test your make_disc_block() function
+        test_final_block = test_critic.critic.make_crit_block(1, 10, kernel_size=2, stride=5, final_layer=True)
+        final_output = test_final_block(test_critic.test_images)
 
-        self.assertEqual(tuple(final_output.shape),(num_test, 10, 6, 6))
+        self.assertEqual(tuple(final_output.shape),(test_critic.num_test, 10, 6, 6))
         self.assertGreater(final_output.max(),1.0)
         self.assertLess(final_output.min(),-1.0)
         self.assertGreater(final_output.std(),0.3)
@@ -96,13 +86,8 @@ class test_critic(unittest.TestCase):
     
     ## Test the whole block
     def test_whole_block(self):
-          #Test your make_disc_block() function
-        num_test = 100
-        gen = Generator()
-        critic = Critic()
-        test_images = gen(get_noise(num_test, gen.z_dim))
-        critic_output = Critic(test_images)
-        self.assertEqual(tuple(critic_output.shape) == (num_test, 1))
+        critic_output = test_critic.critic(test_critic.test_images)
+        self.assertEqual(tuple(critic_output.shape),(test_critic.num_test, 1))
         self.assertGreater(critic_output.std(), 0.25)
         self.assertLess(critic_output.std(),0.5)
 
