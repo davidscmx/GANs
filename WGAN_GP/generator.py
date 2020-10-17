@@ -1,6 +1,7 @@
 
 import torch
 from torch import nn
+import unittest
 
 class Generator(nn.Module):
     '''
@@ -46,14 +47,23 @@ class Generator(nn.Module):
                 nn.Tanh(),
             )
 
+    def unsqueeze_noise(self, noise):
+        '''
+        Function for completing a forward pass of the generator: Given a noise tensor, 
+        returns a copy of that noise with width and height = 1 and channels = z_dim.
+        Parameters:
+            noise: a noise tensor with dimensions (n_samples, z_dim)
+        '''
+        return noise.view(len(noise), self.z_dim, 1, 1)
+
     def forward(self, noise):
         '''
-        Function for completing a forward pass of the generator: Given a noise tensor,
+        Function for completing a forward pass of the generator: Given a noise tensor, 
         returns generated images.
         Parameters:
             noise: a noise tensor with dimensions (n_samples, z_dim)
         '''
-        x = noise.view(len(noise), self.z_dim, 1, 1)
+        x = self.unsqueeze_noise(noise)
         return self.gen(x)
 
 def get_noise(n_samples, z_dim, device='cpu'):
@@ -66,3 +76,52 @@ def get_noise(n_samples, z_dim, device='cpu'):
       device: the device type
     '''
     return torch.randn(n_samples, z_dim, device=device)
+
+
+class test_generator(unittest.TestCase):
+    gen = Generator()
+    num_test = 100
+
+    # Test the hidden block
+    
+    #hidden_output = test_hidden_block(test_uns_noise)
+    #hidden_output = test_hidden(test_uns_noise)
+
+    # Test the hidden block    
+    def test_hidden_block(self):        
+        test_hidden_noise = get_noise(test_generator.num_test, test_generator.gen.z_dim)
+        test_hidden_block = test_generator.gen.make_gen_block(10, 20, kernel_size=4, stride=1)
+        test_uns_noise = test_generator.gen.unsqueeze_noise(test_hidden_noise)
+        hidden_output = test_hidden_block(test_uns_noise)
+        test_hidden = hidden_output     
+
+        self.assertEqual(tuple(test_hidden.shape),(test_generator.num_test, 20, 4, 4))
+        self.assertGreater(test_hidden.max(),1)
+        self.assertEqual(test_hidden.min(),0)
+        self.assertGreater(test_hidden.std(),0.2)
+        self.assertLess(test_hidden.std(),1)
+        self.assertGreater(test_hidden.std(),0.5)
+
+    def test_strides(self):
+        # Check that it works with other strides
+        test_hidden_noise = get_noise(test_generator.num_test, test_generator.gen.z_dim)
+        test_hidden_block = test_generator.gen.make_gen_block(10, 20, kernel_size=4, stride=1)
+        test_uns_noise = test_generator.gen.unsqueeze_noise(test_hidden_noise)
+        hidden_output = test_hidden_block(test_uns_noise)
+
+        test_hidden_block_stride = test_generator.gen.make_gen_block(20, 20, kernel_size=4, stride=2)
+        self.assertEqual(tuple(test_hidden_block_stride(hidden_output).shape), (test_generator.num_test, 20, 10, 10))
+
+    #def test_whole_block(self):
+    #    test_final_noise = get_noise(num_test, gen.z_dim) * 20
+    #    test_final_block = gen.make_gen_block(10, 20, final_layer=True)
+    #    test_final_uns_noise = gen.unsqueeze_noise(test_final_noise)        
+#
+    #    final_output = test_final_block(test_final_uns_noise)
+    #    ## Test the whole thing:
+    #    test_gen_noise = get_noise(num_test, gen.z_dim)
+    #    test_uns_gen_noise = gen.unsqueeze_noise(test_gen_noise)
+    #    gen_output = gen(test_uns_gen_noise)
+
+#if __name__ == '__main__':
+#    unittest.main()

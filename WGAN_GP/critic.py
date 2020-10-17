@@ -4,6 +4,7 @@ from generator import Generator, get_noise
 import torch
 from torch import nn
 import unittest
+
 class Critic(nn.Module):
     '''
     Critic Class
