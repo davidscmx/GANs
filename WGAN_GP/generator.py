@@ -112,16 +112,24 @@ class test_generator(unittest.TestCase):
         test_hidden_block_stride = test_generator.gen.make_gen_block(20, 20, kernel_size=4, stride=2)
         self.assertEqual(tuple(test_hidden_block_stride(hidden_output).shape), (test_generator.num_test, 20, 10, 10))
 
-    #def test_whole_block(self):
-    #    test_final_noise = get_noise(num_test, gen.z_dim) * 20
-    #    test_final_block = gen.make_gen_block(10, 20, final_layer=True)
-    #    test_final_uns_noise = gen.unsqueeze_noise(test_final_noise)        
-#
-    #    final_output = test_final_block(test_final_uns_noise)
-    #    ## Test the whole thing:
-    #    test_gen_noise = get_noise(num_test, gen.z_dim)
-    #    test_uns_gen_noise = gen.unsqueeze_noise(test_gen_noise)
-    #    gen_output = gen(test_uns_gen_noise)
+    def test_final_block(self):
+        test_final_noise = get_noise(test_generator.num_test, test_generator.gen.z_dim) * 20
+        test_final_block = test_generator.gen.make_gen_block(10, 20, final_layer=True)
+        test_final_uns_noise = test_generator.gen.unsqueeze_noise(test_final_noise)        
 
-#if __name__ == '__main__':
-#    unittest.main()
+        final_output = test_final_block(test_final_uns_noise)
+        self.assertEqual(final_output.max().item(), 1)
+        self.assertEqual(final_output.min().item(),-1)
+    
+    def test_whole_block(self):
+        ## Test the whole thing:
+        test_gen_noise = get_noise(test_generator.num_test, test_generator.gen.z_dim)
+        test_uns_gen_noise = test_generator.gen.unsqueeze_noise(test_gen_noise)
+        gen_output = test_generator.gen(test_uns_gen_noise)
+    
+        self.assertEqual(tuple(gen_output.shape), (test_generator.num_test, 1, 28, 28))
+        self.assertGreater(gen_output.std(),0.5)
+        self.assertLess(gen_output.std(), 0.8)
+
+if __name__ == '__main__':
+    unittest.main()
