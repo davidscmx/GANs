@@ -46,8 +46,7 @@ class test_gradient_penalty(unittest.TestCase):
 
         self.assertTrue(torch.isclose(bad_gradient_penalty, torch.tensor(1.)))
         self.assertTrue(torch.isclose(good_gradient_penalty, torch.tensor(0.)))
-        
-        
+                
         #TODO 
         #self.assertLess(torch.abs(random_gradient_penalty - 1),0.1)
 

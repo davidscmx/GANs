@@ -22,7 +22,6 @@ def get_gradient(crit, real, fake, epsilon):
     # Take the gradient of the scores with respect to the images
     gradient = torch.autograd.grad(
         # Note: You need to take the gradient of outputs with respect to inputs.
-        # This documentation may be useful, but it should not be necessary:
         # https://pytorch.org/docs/stable/autograd.html#torch.autograd.grad
         inputs=mixed_images,
         outputs=mixed_scores,

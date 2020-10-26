@@ -11,8 +11,10 @@ from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 torch.manual_seed(0) # Set for testing purposes, please do not change!
 
-from generator import Generator
+from generator import Generator, get_noise
 from critic import Critic
+from losses import *
+from gradient_penalty import *
 
 def show_tensor_images(image_tensor, num_images=25, size=(1, 28, 28)):
     '''
@@ -38,7 +40,7 @@ def make_grad_hook():
 
 n_epochs = 100
 z_dim = 64
-display_step = 50
+display_step = 1000
 batch_size = 128
 lr = 0.0002
 beta_1 = 0.5
@@ -72,35 +74,6 @@ gen = gen.apply(weights_init)
 crit = crit.apply(weights_init)
 
 
-
-def get_gen_loss(crit_fake_pred):
-    '''
-    Return the loss of a generator given the critic's scores of the generator's fake images.
-    Parameters:
-        crit_fake_pred: the critic's scores of the fake images
-    Returns:
-        gen_loss: a scalar loss value for the current batch of the generator
-    '''
-    gen_loss = -torch.mean(crit_fake_pred)
-    return gen_loss
-
-# UNQ_C4 (UNIQUE CELL IDENTIFIER, DO NOT EDIT)
-# GRADED FUNCTION: get_crit_loss
-def get_crit_loss(crit_fake_pred, crit_real_pred, gp, c_lambda):
-    '''
-    Return the loss of a critic given the critic's scores for fake and real images,
-    the gradient penalty, and gradient penalty weight.
-    Parameters:
-        crit_fake_pred: the critic's scores of the fake images
-        crit_real_pred: the critic's scores of the real images
-        gp: the unweighted gradient penalty
-        c_lambda: the current weight of the gradient penalty 
-    Returns:
-        crit_loss: a scalar for the critic's loss, accounting for the relevant factors
-    '''
-    crit_loss = torch.mean(crit_fake_pred) - torch.mean(crit_real_pred)  + c_lambda*gp
-    return crit_loss
-
 import matplotlib.pyplot as plt
 
 cur_step = 0
@@ -123,6 +96,8 @@ for epoch in range(n_epochs):
 
             epsilon = torch.rand(len(real), 1, 1, 1, device=device, requires_grad=True)
             gradient = get_gradient(crit, real, fake.detach(), epsilon)
+            
+            #WCGAN-GP
             gp = gradient_penalty(gradient)            
             
             crit_loss = get_crit_loss(crit_fake_pred, crit_real_pred, gp, c_lambda)
