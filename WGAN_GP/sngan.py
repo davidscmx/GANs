@@ -24,13 +24,13 @@ batch_size = 128
 # A learning rate of 0.0002 works well on DCGAN
 lr = 0.0002
 
-# These parameters control the optimizer's momentum, which you can read more about here:
-# https://distill.pub/2017/momentum/ but you don’t need to worry about it for this course
+# Optimizer's momentum
+# https://distill.pub/2017/momentum/ 
 beta_1 = 0.5 
 beta_2 = 0.999
 device = 'cuda'
 
-# We tranform our image values to be between -1 and 1 (the range of the tanh activation)
+# Tranform our image values to be between -1 and 1 (the range of the tanh activation)
 transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.5,), (0.5,)),
