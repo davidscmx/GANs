@@ -1,7 +1,6 @@
 
 import torch
 from torch import nn
-import unittest
 
 class Generator(nn.Module):
     '''
