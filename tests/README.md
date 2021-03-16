@@ -1,6 +1,6 @@
 
 # Run all test with one command:
 
-python ```
+```bash
 python -m unittest discover ./
 ```
