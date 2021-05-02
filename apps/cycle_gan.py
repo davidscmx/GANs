@@ -117,7 +117,6 @@ def train(save_model=False):
 
     for epoch in range(n_epochs):
         # Dataloader returns the batches
-        # for image, _ in tqdm(dataloader):
         for real_A, real_B in tqdm(dataloader):
             real_A = nn.functional.interpolate(real_A, size=target_shape)
             real_B = nn.functional.interpolate(real_B, size=target_shape)
